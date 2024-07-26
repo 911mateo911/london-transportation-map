@@ -25,9 +25,4 @@ export interface TflStopPointRouteSectionRaw {
   vehicleDestinationText: string;
 }
 
-type Coordinate = [number, number];
-type LineString = Coordinate[][];
-
-export interface TflStopPointRouteSection extends Omit<TflStopPointRouteSectionRaw, 'lineString'> {
-  lineString: LineString;
-}
+export type Coordinate = [number, number];
