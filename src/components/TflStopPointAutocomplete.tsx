@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import { useAsyncAutocomplete } from "../hooks/useAsyncAutocomplete";
-import { AppConfig } from "../utils/configuration";
+import { getTflApiBasePath } from "../utils/configuration";
 import { TflStopPoint } from "../types/Tfl";
 import { Autocomplete, AutocompleteProps, Box, Loader } from "@mantine/core";
 
@@ -32,8 +32,8 @@ export const TflStopPointAutocomplete = ({
     shouldQuery: false
   });
 
-  const { data, loading } = useAsyncAutocomplete<StopPointSearchApiResponse>(
-    `${AppConfig.mapSearchEndpointBasePath}/StopPoint/Search/${inputState.term}`,
+  const { data, isLoading } = useAsyncAutocomplete<StopPointSearchApiResponse>(
+    getTflApiBasePath(`/StopPoint/Search/${inputState.term}`),
     getIsEnabledEndpoint(inputState)
   );
 
@@ -88,7 +88,7 @@ export const TflStopPointAutocomplete = ({
           h={16}
           className="flex items-center justify-center"
         >
-          {loading && (
+          {isLoading && (
             <Loader
               size={16}
               color='gray'

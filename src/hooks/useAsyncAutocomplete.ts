@@ -7,9 +7,9 @@ export function useAsyncAutocomplete<DataType extends object>(
   debounceTime = 600
 ) {
   const [data, setData] = useState<DataType | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
-  const cache = useRef(new MaxSizeCacheWithInvalidation(50));
+  const cache = useRef(new MaxSizeCacheWithInvalidation<DataType>(50));
 
   const fetchDataWithTimeout = useCallback(async () => {
     try {
@@ -25,8 +25,9 @@ export function useAsyncAutocomplete<DataType extends object>(
       setData(data);
     } catch (err) {
       console.error(err);
+      setData(null);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, [fetchUrl]);
 
@@ -35,17 +36,16 @@ export function useAsyncAutocomplete<DataType extends object>(
       clearTimeout(timeoutIdRef.current);
     }
 
-
     if (!enabled || !fetchUrl) {
       setData(null);
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
     const cachedData = cache.current.get(fetchUrl);
     if (cachedData) {
       setData(cachedData);
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
 
@@ -60,5 +60,5 @@ export function useAsyncAutocomplete<DataType extends object>(
     };
   }, [debounceTime, enabled, fetchDataWithTimeout, fetchUrl]);
 
-  return { data, loading };
+  return { data, isLoading };
 }

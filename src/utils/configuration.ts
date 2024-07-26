@@ -20,3 +20,7 @@ export const AppConfig: AppConfigType = {
   },
   mapSearchEndpointBasePath: 'https://api.tfl.gov.uk'
 };
+
+export const getTflApiBasePath = (route: string) => {
+  return `${AppConfig.mapSearchEndpointBasePath}${route}`
+}

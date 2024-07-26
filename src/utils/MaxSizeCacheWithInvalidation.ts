@@ -1,6 +1,6 @@
-export class MaxSizeCacheWithInvalidation {
+export class MaxSizeCacheWithInvalidation<T extends object> {
   private maxSize: number;
-  private cacheMap = new Map();
+  private cacheMap = new Map<string | undefined, T>();
   private keyOrderList: string[] = [];
 
   constructor(maxSize: number) {
@@ -11,7 +11,7 @@ export class MaxSizeCacheWithInvalidation {
     return this.cacheMap.get(key);
   }
 
-  set(key: string, value: object) {
+  set(key: string, value: T) {
     if (this.cacheMap.size >= this.maxSize) {
       const oldestKey = this.keyOrderList.shift();
       this.cacheMap.delete(oldestKey);
