@@ -6,6 +6,7 @@ import { Autocomplete, AutocompleteProps, Box, Loader } from "@mantine/core";
 
 interface TflStopPointAutocompleteProps extends AutocompleteProps {
   onSelectOption: (stopPoint: TflStopPoint) => void;
+  onInputClear?: () => void;
   className?: string;
 }
 
@@ -18,13 +19,14 @@ interface InputState {
   shouldQuery: boolean;
 }
 
-const getIsEnabledEndpoint = (inputState: InputState) => {
+const getIsEndpointEnabled = (inputState: InputState) => {
   return inputState.term.length > 3 && inputState.shouldQuery;
 };
 
 export const TflStopPointAutocomplete = ({
   onSelectOption,
   className,
+  onInputClear,
   ...autoCompleteProps
 }: TflStopPointAutocompleteProps) => {
   const [inputState, setInputState] = useState<InputState>({
@@ -32,27 +34,12 @@ export const TflStopPointAutocomplete = ({
     shouldQuery: false
   });
 
+  const isEndpointEnabled = getIsEndpointEnabled(inputState);
+
   const { data, isLoading } = useAsyncAutocomplete<StopPointSearchApiResponse>(
     getTflApiBasePath(`/StopPoint/Search/${inputState.term}`),
-    getIsEnabledEndpoint(inputState)
+    isEndpointEnabled
   );
-
-  const handleInputChange = (inputValue: string) => {
-    const foundStopPoint = data?.matches.find(({ name }) => name === inputValue);
-
-    setInputState({
-      term: inputValue,
-      shouldQuery: !foundStopPoint
-    })
-  }
-
-  const handleSubmitOption = (optionName: string) => {
-    const foundStopPoint = data?.matches.find(({ name }) => name === optionName);
-
-    if (foundStopPoint) {
-      onSelectOption(foundStopPoint);
-    }
-  }
 
   const autoCompleteOptions = useMemo(() => {
     if (!data?.matches || !inputState.term) {
@@ -73,6 +60,28 @@ export const TflStopPointAutocomplete = ({
       return acc;
     }, []);
   }, [data?.matches, inputState.term]);
+  const hasAutocompleteError = !isLoading && !autoCompleteOptions.length && isEndpointEnabled;
+
+  const handleInputChange = (inputValue: string) => {
+    if (!inputValue && onInputClear) {
+      onInputClear();
+    }
+
+    const foundStopPoint = data?.matches.find(({ name }) => name === inputValue);
+
+    setInputState({
+      term: inputValue,
+      shouldQuery: !foundStopPoint
+    })
+  }
+
+  const handleSubmitOption = (optionName: string) => {
+    const foundStopPoint = data?.matches.find(({ name }) => name === optionName);
+
+    if (foundStopPoint) {
+      onSelectOption(foundStopPoint);
+    }
+  }
 
   return (
     <Autocomplete
@@ -82,6 +91,7 @@ export const TflStopPointAutocomplete = ({
       data={autoCompleteOptions}
       maxDropdownHeight={200}
       className={className}
+      error={hasAutocompleteError}
       rightSection={
         <Box
           w={16}

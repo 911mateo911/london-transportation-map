@@ -38,6 +38,7 @@ export function useAsyncAutocomplete<DataType extends object>(
 
     if (!enabled || !fetchUrl) {
       setData(null);
+      setIsLoading(false);
       return;
     }
 
