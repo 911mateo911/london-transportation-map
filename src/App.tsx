@@ -2,7 +2,9 @@ import {
   createBrowserRouter,
   RouterProvider
 } from "react-router-dom";
-import { MapPage } from './pages/MapPage';
+import { MantineProvider } from "@mantine/core";
+import '@mantine/core/styles.css';
+import { MapPage } from "./pages/MapPage";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +18,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <>
-      <RouterProvider router={router} />
+      <MantineProvider>
+        <RouterProvider router={router} />
+      </MantineProvider>
     </>
   )
 }

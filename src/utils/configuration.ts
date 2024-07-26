@@ -4,7 +4,8 @@ type AppConfigType = {
   mapPageConfig: {
     tileLayerDataProvider: string;
     mapInitialViewState: MapViewState;
-  }
+  };
+  mapSearchEndpointBasePath: string;
 };
 
 export const AppConfig: AppConfigType = {
@@ -16,5 +17,6 @@ export const AppConfig: AppConfigType = {
       zoom: 11,
       maxZoom: 20,
     }
-  }
-}
+  },
+  mapSearchEndpointBasePath: 'https://api.tfl.gov.uk'
+};
