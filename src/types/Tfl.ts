@@ -1,4 +1,4 @@
-export interface TflStopPoint {
+export interface TflStopPointSearchResult {
   $type: string;
   icsId: string;
   modes: string[];
@@ -9,20 +9,38 @@ export interface TflStopPoint {
   lon: number;
 }
 
-export interface TflStopPointRouteSectionRaw {
+export interface TflStopPointData {
   $type: string;
-  destinationName: string;
-  direction: string;
-  isActive: boolean;
-  lineId: string;
-  lineString: string;
-  mode: string;
   naptanId: string;
-  routeSectionName: string;
-  serviceType: string;
-  validFrom: string;
-  validTo: string;
-  vehicleDestinationText: string;
+  modes: string[];
+  icsCode: string;
+  stopType: string;
+  stationNaptan: string;
+  lines: TflLine[];
+  // And other non mapped properties
+}
+
+interface TflLine {
+  $type: string;
+  id: string;
+  name: string;
+  uri: string;
+  type: string;
+  crowding: TflCrowd;
+  routeType: string;
+  status: string;
+}
+
+interface TflCrowd {
+  $type: string;
+}
+
+export interface TflRouteSequenceData {
+  $type: string;
+  lineId: string;
+  lineName: string;
+  direction: string;
+  lineStrings: string[];
 }
 
 export type Coordinate = [number, number];

@@ -19,16 +19,16 @@ type AppConfigType = {
 const TILE_LAYER_PROVIDER = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const MAP_SEARCH_ENDPOINT_BASE_PATH = 'https://api.tfl.gov.uk';
 export const DEFAULT_COLORS: RgbColor[] = [
-  [128, 0, 128],
-  [255, 102, 102],
-  [0, 255, 0],
-  [102, 255, 102],
-  [0, 0, 255],
-  [102, 102, 255],
-  [255, 0, 255],
-  [255, 102, 255],
-  [0, 255, 255],
-  [102, 255, 255]
+  [102, 0, 102],
+  [204, 81, 81],
+  [0, 204, 0],
+  [81, 204, 81],
+  [0, 0, 204],
+  [81, 81, 204],
+  [204, 0, 204],
+  [204, 81, 204],
+  [0, 204, 204],
+  [81, 204, 204]
 ];
 
 export const AppConfig: AppConfigType = {

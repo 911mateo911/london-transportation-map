@@ -1,17 +1,17 @@
 import { useMemo, useState } from "react"
 import { useAsyncAutocomplete } from "../hooks/useAsyncAutocomplete";
 import { getTflApiBasePath } from "../utils/configuration";
-import { TflStopPoint } from "../types/Tfl";
+import { TflStopPointSearchResult } from "../types/Tfl";
 import { Autocomplete, AutocompleteProps, Box, Loader } from "@mantine/core";
 
 interface TflStopPointAutocompleteProps extends AutocompleteProps {
-  onSelectOption: (stopPoint: TflStopPoint) => void;
+  onSelectOption: (stopPoint: TflStopPointSearchResult) => void;
   onInputClear?: () => void;
   className?: string;
 }
 
 interface StopPointSearchApiResponse {
-  matches: TflStopPoint[];
+  matches: TflStopPointSearchResult[];
 }
 
 interface InputState {
