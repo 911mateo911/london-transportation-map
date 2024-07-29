@@ -48,6 +48,8 @@ const tileLayer = new TileLayer<ImageBitmap>({
   }
 });
 
+const mapView = new MapView({ repeat: true });
+
 const createMarkerLayer = (selectedStopPoint: TflStopPointSearchResult | null) => {
   if (!selectedStopPoint) {
     return null;
@@ -70,12 +72,12 @@ const createMarkerLayer = (selectedStopPoint: TflStopPointSearchResult | null) =
 export const MapPage = ({
   initialViewState = AppConfig.mapPageConfig.mapInitialViewState
 }: MapPageProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingRoutes, setIsLoadingRoutes] = useState<boolean>(false);
   const [allRoutesForStopPoint, setAllRoutesForStopPoint] = useState<RouteSequenceWithLineName[]>([]);
   const [selectedStopPoint, setSelectedStopPoint] = useState<TflStopPointSearchResult | null>(null);
   const [mapViewState, setMapViewState] = useState<MapViewState>(initialViewState);
 
-  const hasNoRoutesForSelectedStopPoint = selectedStopPoint && !isLoading && !allRoutesForStopPoint.length;
+  const hasNoRoutesForSelectedStopPoint = selectedStopPoint && !isLoadingRoutes && !allRoutesForStopPoint.length;
 
   const [fetchStopPointData] = useCachedFetch<TflStopPointData>();
 
@@ -85,6 +87,7 @@ export const MapPage = ({
   });
 
   const fetchRouteSequencesFromStopPoint = useCallback(async (stopPoint: TflStopPointData) => {
+    setIsLoadingRoutes(true);
     const lines = stopPoint.lines.slice(0, AppConfig.mapPageConfig.maxRoutesPerStopPoint);
 
     const routeSequencesResponse = await Promise.allSettled(lines.map(line => {
@@ -109,7 +112,7 @@ export const MapPage = ({
     }, []);
 
     setAllRoutesForStopPoint(normalizedRouteSequences)
-    setIsLoading(false);
+    setIsLoadingRoutes(false);
   }, [fetchRouteSequenceData]);
 
   const handleResetData = () => {
@@ -131,9 +134,12 @@ export const MapPage = ({
         return currState;
       }
     });
-    if (stopPoint && stopPoint.id !== selectedStopPoint?.id) {
-      setIsLoading(true);
-      setAllRoutesForStopPoint([]);
+
+    if (!stopPoint) {
+      return handleResetData();
+    }
+
+    if (stopPoint.id !== selectedStopPoint?.id) {
       fetchStopPointData(getTflApiBasePath(`/StopPoint/${stopPoint.id}`))
         .then(async data => {
           if (!data) {
@@ -142,8 +148,6 @@ export const MapPage = ({
           // Optimistic fetch, no need to await
           fetchRouteSequencesFromStopPoint(data);
         });
-    } else {
-      handleResetData();
     }
   };
 
@@ -154,7 +158,7 @@ export const MapPage = ({
   const markerLayer = useMemo(() => createMarkerLayer(selectedStopPoint), [selectedStopPoint]);
 
   const lineLayers = useMemo(() => {
-    if (!allRoutesForStopPoint?.length) {
+    if (!allRoutesForStopPoint?.length || isLoadingRoutes) {
       return [];
     }
 
@@ -187,13 +191,13 @@ export const MapPage = ({
 
         return acc;
       }, []);
-  }, [allRoutesForStopPoint]);
+  }, [allRoutesForStopPoint, isLoadingRoutes]);
 
   return (
     <div
       className='relative w-screen h-screen'
     >
-      {isLoading && (
+      {isLoadingRoutes && (
         <ToastMessage
           label={`Loading routes for ${selectedStopPoint?.name}`}
           icon={<Loader size={16} />}
@@ -219,7 +223,7 @@ export const MapPage = ({
       />
       <DeckGL
         layers={[tileLayer, ...lineLayers, markerLayer]}
-        views={new MapView({ repeat: true })}
+        views={mapView}
         controller={true}
         getTooltip={({ object }) => object && object.name}
         viewState={mapViewState}

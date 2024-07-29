@@ -8,7 +8,7 @@ export class MaxSizeCacheWithInvalidation<T extends object> {
   }
 
   get(key: string) {
-    return this.cacheMap.get(key);
+    return this.cacheMap.get(key.toLowerCase());
   }
 
   set(key: string, value: T) {
@@ -16,7 +16,7 @@ export class MaxSizeCacheWithInvalidation<T extends object> {
       const oldestKey = this.keyOrderList.shift();
       this.cacheMap.delete(oldestKey);
     }
-    this.cacheMap.set(key, value);
-    this.keyOrderList.push(key);
+    this.cacheMap.set(key.toLowerCase(), value);
+    this.keyOrderList.push(key.toLowerCase());
   }
 }
